@@ -113,7 +113,7 @@ abstract class ExtractTopicTest {
         final SinkRecord originalRecord = record(SchemaBuilder.INT8_SCHEMA, "some");
         final Throwable e = assertThrows(DataException.class,
             () -> transformation(FIELD, skipMissingOrNull).apply(originalRecord));
-        assertEquals(dataPlace() + " schema type must be STRUCT if field name is specified: "
+        assertEquals(dataPlace() + " schema type must be STRUCT or MAP if field name is specified: "
                 + originalRecord,
             e.getMessage());
     }

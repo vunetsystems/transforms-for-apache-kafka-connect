@@ -17,6 +17,7 @@
 package io.aiven.kafka.connect.transforms;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -99,34 +100,36 @@ public abstract class ExtractTopic<R extends ConnectRecord<R>> implements Transf
                                                       final Schema schema,
                                                       final Object value,
                                                       final String fieldName) {
-        if (Schema.Type.STRUCT != schema.type()) {
-            throw new DataException(dataPlace() + " schema type must be STRUCT if field name is specified: "
-                + recordStr);
-        }
 
         if (value == null) {
             throw new DataException(dataPlace() + " can't be null if field name is specified: " + recordStr);
         }
-
-        final Field field = schema.field(fieldName);
-        if (field == null) {
-            if (config.skipMissingOrNull()) {
-                return Optional.empty();
-            } else {
-                throw new DataException(fieldName + " in " + dataPlace() + " schema can't be missing: " + recordStr);
+        final Optional<String> result;
+        if (Schema.Type.STRUCT == schema.type()) {
+            final Field field = schema.field(fieldName);
+            if (field == null) {
+                if (config.skipMissingOrNull()) {
+                    return Optional.empty();
+                } else {
+                    throw new DataException(fieldName + " in " + dataPlace() + " schema can't be missing: "
+                     + recordStr);
+                }
             }
+            if (!SUPPORTED_TYPES_TO_CONVERT_FROM.contains(field.schema().type())) {
+                throw new DataException(fieldName + " schema type in " + dataPlace()
+                    + " must be " + SUPPORTED_TYPES_TO_CONVERT_FROM
+                    + ": " + recordStr);
+            }
+            final Struct struct = (Struct) value;
+            result = Optional.ofNullable(struct.get(fieldName)).map(Object::toString);
+        } else if (Schema.Type.MAP == schema.type()) {
+            final Map struct = new HashMap<>((Map<?, ?>) value);
+            result = Optional.ofNullable(struct.get(fieldName)).map(Object::toString);
+
+        } else {
+            throw new DataException(dataPlace() + " schema type must be STRUCT or MAP if field name is specified: "
+                + recordStr);
         }
-
-        if (!SUPPORTED_TYPES_TO_CONVERT_FROM.contains(field.schema().type())) {
-            throw new DataException(fieldName + " schema type in " + dataPlace()
-                + " must be " + SUPPORTED_TYPES_TO_CONVERT_FROM
-                + ": " + recordStr);
-        }
-
-        final Struct struct = (Struct) value;
-
-        final Optional<String> result = Optional.ofNullable(struct.get(fieldName))
-            .map(Object::toString);
         if (result.isPresent() && !result.get().equals("")) {
             return result;
         } else {
