@@ -186,7 +186,7 @@ abstract class ExtractTimestampTest {
         } else {
             timestamp = instance.toEpochMilli();
         }
-        final HashMap props = new HashMap<String, String>();
+        final Map props = new HashMap<String, String>();
         props.put(ExtractTimestampConfig.EPOCH_RESOLUTION_CONFIG, tsResolution.resolution());
         final SinkRecord originalRecord = record(null, new Struct(schema).put(FIELD, timestamp));
         final ConnectRecord transformedRecord = transformation(props).apply(originalRecord);
@@ -201,7 +201,7 @@ abstract class ExtractTimestampTest {
                 ZoneId.of("UTC")
         );
         final Instant instance = datetime.toInstant();
-        final HashMap props = new HashMap<String, String>();
+        final Map props = new HashMap<String, String>();
         props.put(ExtractTimestampConfig.EPOCH_RESOLUTION_CONFIG, tsResolution.resolution());
         final long timestamp;
         if (tsResolution == ExtractTimestampConfig.TimestampResolution.SECONDS) {
@@ -225,7 +225,7 @@ abstract class ExtractTimestampTest {
                 ZoneId.of("UTC")
         );
         final Instant instant = datetime.toInstant();
-        final HashMap props = new HashMap<String, String>();
+        final Map props = new HashMap<String, String>();
         props.put(ExtractTimestampConfig.EPOCH_RESOLUTION_CONFIG, tsResolution.resolution());
         final SinkRecord originalRecord = record(null, new Struct(schema).put(FIELD, Date.from(instant)));
         final ConnectRecord transformedRecord = transformation(props).apply(originalRecord);
@@ -240,7 +240,7 @@ abstract class ExtractTimestampTest {
                 ZoneId.of("UTC")
         );
         final Instant instant = datetime.toInstant();
-        final HashMap props = new HashMap<String, String>();
+        final Map props = new HashMap<String, String>();
         props.put(ExtractTimestampConfig.EPOCH_RESOLUTION_CONFIG, tsResolution.resolution());
         final SinkRecord originalRecord = record(null, ImmutableMap.of(FIELD, Date.from(instant)));
         final ConnectRecord transformedRecord = transformation(props).apply(originalRecord);

@@ -63,9 +63,6 @@ public abstract class ExtractTopic<R extends ConnectRecord<R>> implements Transf
     @Override
     public R apply(final R record) {
         final SchemaAndValue schemaAndValue = getSchemaAndValue(record);
-        if (schemaAndValue.schema() == null) {
-            throw new DataException(dataPlace() + " schema can't be null: " + record);
-        }
 
         final Optional<String> newTopic;
         if (config.fieldName().isPresent()) {
@@ -105,7 +102,7 @@ public abstract class ExtractTopic<R extends ConnectRecord<R>> implements Transf
             throw new DataException(dataPlace() + " can't be null if field name is specified: " + recordStr);
         }
         final Optional<String> result;
-        if (Schema.Type.STRUCT == schema.type()) {
+        if (value instanceof Struct) {
             final Field field = schema.field(fieldName);
             if (field == null) {
                 if (config.skipMissingOrNull()) {
@@ -122,7 +119,7 @@ public abstract class ExtractTopic<R extends ConnectRecord<R>> implements Transf
             }
             final Struct struct = (Struct) value;
             result = Optional.ofNullable(struct.get(fieldName)).map(Object::toString);
-        } else if (Schema.Type.MAP == schema.type()) {
+        } else if (value instanceof Map) {
             final Map struct = new HashMap<>((Map<?, ?>) value);
             result = Optional.ofNullable(struct.get(fieldName)).map(Object::toString);
 
