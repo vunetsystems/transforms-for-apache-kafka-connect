@@ -71,14 +71,14 @@ public abstract class ExtractTimestamp<R extends ConnectRecord<R>> implements Tr
 
         final long newTimestamp;
         if (fieldValue instanceof Long) {
-            final var longFieldValue = (long) fieldValue;
+            final long longFieldValue = (long) fieldValue;
             if (config.timestampResolution() == ExtractTimestampConfig.TimestampResolution.SECONDS) {
                 newTimestamp = TimeUnit.SECONDS.toMillis(longFieldValue);
             } else {
                 newTimestamp = longFieldValue;
             }
         } else if (fieldValue instanceof Date) {
-            final var dateFieldValue = (Date) fieldValue;
+            final Date dateFieldValue = (Date) fieldValue;
             newTimestamp = dateFieldValue.getTime();
         } else {
             throw new DataException(config.fieldName()

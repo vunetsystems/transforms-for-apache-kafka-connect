@@ -39,14 +39,6 @@ abstract class ExtractTopicTest {
     private static final String FIELD = "test_field";
     private static final String NEW_TOPIC = "new_topic";
 
-    @ParameterizedTest
-    @ValueSource(booleans = { true, false })
-    void nullSchema(final boolean skipMissingOrNull) {
-        final SinkRecord originalRecord = record(null, null);
-        final Throwable e = assertThrows(DataException.class,
-            () -> transformation(FIELD, skipMissingOrNull).apply(originalRecord));
-        assertEquals(dataPlace() + " schema can't be null: " + originalRecord, e.getMessage());
-    }
 
     @ParameterizedTest
     @ValueSource(booleans = { true, false })
@@ -113,7 +105,7 @@ abstract class ExtractTopicTest {
         final SinkRecord originalRecord = record(SchemaBuilder.INT8_SCHEMA, "some");
         final Throwable e = assertThrows(DataException.class,
             () -> transformation(FIELD, skipMissingOrNull).apply(originalRecord));
-        assertEquals(dataPlace() + " schema type must be STRUCT if field name is specified: "
+        assertEquals(dataPlace() + " schema type must be STRUCT or MAP if field name is specified: "
                 + originalRecord,
             e.getMessage());
     }

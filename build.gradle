@@ -38,8 +38,8 @@ repositories {
     mavenCentral()
 }
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 ext {
     kafkaVersion = "2.0.1"
@@ -95,6 +95,9 @@ dependencies {
     compileOnly "io.debezium:debezium-api:$debeziumVersion"
 
     implementation "org.slf4j:slf4j-api:1.7.36"
+    implementation platform('org.testcontainers:testcontainers-bom:1.17.5') //import bom
+    // https://mavenlibs.com/maven/dependency/org.apache.kafka/connect-runtime
+    implementation "org.apache.kafka:connect-runtime:$kafkaVersion"
 
     testImplementation "org.junit.jupiter:junit-jupiter:5.9.1"
     testImplementation "org.hamcrest:hamcrest:2.2"

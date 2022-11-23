@@ -68,7 +68,7 @@
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#ImportOrder -->
         <module name="ImportOrder">
             <property name="option" value="bottom"/>
-            <property name="groups" value="javax.,java.,org.apache.kafka.,io.aiven."/>
+            <property name="groups" value="com.google.,javax.,java.,org.apache.kafka.,io.aiven."/>
             <property name="ordered" value="true"/>
             <property name="separated" value="true"/>
             <property name="separatedStaticGroups" value="true"/>
@@ -288,8 +288,9 @@
         <module name="ClassFanOutComplexity"/>
 
         <!-- See http://checkstyle.sourceforge.net/config_metrics.html#CyclomaticComplexity -->
-        <module name="CyclomaticComplexity"/>
-
+        <module name="CyclomaticComplexity">
+            <property name="max" value="11"/>
+        </module>
         <!-- See http://checkstyle.sourceforge.net/config_metrics.html#JavaNCSS -->
         <module name="JavaNCSS"/>
 

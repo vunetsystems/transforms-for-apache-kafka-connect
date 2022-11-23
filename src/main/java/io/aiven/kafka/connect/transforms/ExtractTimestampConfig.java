@@ -57,7 +57,7 @@ final class ExtractTimestampConfig extends AbstractConfig {
         }
 
         public static TimestampResolution fromString(final String value) {
-            for (final var r : values()) {
+            for (final TimestampResolution r : values()) {
                 if (r.resolution.equals(value)) {
                     return r;
                 }

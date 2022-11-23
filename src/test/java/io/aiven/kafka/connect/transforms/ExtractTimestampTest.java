@@ -16,6 +16,9 @@
 
 package io.aiven.kafka.connect.transforms;
 
+import  com.google.common.collect.ImmutableMap;
+
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -23,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.kafka.common.record.TimestampType;
+import org.apache.kafka.connect.connector.ConnectRecord;
 import org.apache.kafka.connect.data.Schema;
 import org.apache.kafka.connect.data.SchemaBuilder;
 import org.apache.kafka.connect.data.Struct;
@@ -170,34 +174,34 @@ abstract class ExtractTimestampTest {
     @ParameterizedTest
     @EnumSource(value = ExtractTimestampConfig.TimestampResolution.class, names = {"MILLISECONDS", "SECONDS"})
     void structWithIntField(final ExtractTimestampConfig.TimestampResolution tsResolution) {
-        final var schema = SchemaBuilder.struct().field(FIELD, Schema.INT64_SCHEMA).build();
-        final var datetime = ZonedDateTime.of(
+        final Schema schema = SchemaBuilder.struct().field(FIELD, Schema.INT64_SCHEMA).build();
+        final ZonedDateTime datetime = ZonedDateTime.of(
                 2020, 11, 15, 1, 2, 3, 4,
                 ZoneId.of("UTC")
         );
-        final var instance = datetime.toInstant();
+        final Instant instance = datetime.toInstant();
         final long timestamp;
         if (tsResolution == ExtractTimestampConfig.TimestampResolution.SECONDS) {
             timestamp = instance.getEpochSecond();
         } else {
             timestamp = instance.toEpochMilli();
         }
-        final var props = new HashMap<String, String>();
+        final Map props = new HashMap<String, String>();
         props.put(ExtractTimestampConfig.EPOCH_RESOLUTION_CONFIG, tsResolution.resolution());
         final SinkRecord originalRecord = record(null, new Struct(schema).put(FIELD, timestamp));
-        final SinkRecord transformedRecord = transformation(props).apply(originalRecord);
+        final ConnectRecord transformedRecord = transformation(props).apply(originalRecord);
         assertEquals(setNewTimestamp(originalRecord, instance.toEpochMilli()), transformedRecord);
     }
 
     @ParameterizedTest
     @EnumSource(value = ExtractTimestampConfig.TimestampResolution.class, names = {"MILLISECONDS", "SECONDS"})
     void mapWithIntField(final ExtractTimestampConfig.TimestampResolution tsResolution) {
-        final var datetime = ZonedDateTime.of(
+        final ZonedDateTime datetime = ZonedDateTime.of(
                 2020, 11, 15, 1, 2, 3, 4,
                 ZoneId.of("UTC")
         );
-        final var instance = datetime.toInstant();
-        final var props = new HashMap<String, String>();
+        final Instant instance = datetime.toInstant();
+        final Map props = new HashMap<String, String>();
         props.put(ExtractTimestampConfig.EPOCH_RESOLUTION_CONFIG, tsResolution.resolution());
         final long timestamp;
         if (tsResolution == ExtractTimestampConfig.TimestampResolution.SECONDS) {
@@ -205,8 +209,8 @@ abstract class ExtractTimestampTest {
         } else {
             timestamp = instance.toEpochMilli();
         }
-        final SinkRecord originalRecord = record(null, Map.of(FIELD, timestamp));
-        final var transformedRecord = transformation(props).apply(originalRecord);
+        final SinkRecord originalRecord = record(null, ImmutableMap.of(FIELD, timestamp));
+        final ConnectRecord transformedRecord = transformation(props).apply(originalRecord);
         assertEquals(setNewTimestamp(originalRecord, instance.toEpochMilli()), transformedRecord);
     }
 
@@ -216,30 +220,30 @@ abstract class ExtractTimestampTest {
         final Schema schema = SchemaBuilder.struct()
                 .field(FIELD, Timestamp.SCHEMA)
                 .build();
-        final var datetime = ZonedDateTime.of(
+        final ZonedDateTime datetime = ZonedDateTime.of(
                 2020, 11, 15, 1, 2, 3, 4,
                 ZoneId.of("UTC")
         );
-        final var instant = datetime.toInstant();
-        final var props = new HashMap<String, String>();
+        final Instant instant = datetime.toInstant();
+        final Map props = new HashMap<String, String>();
         props.put(ExtractTimestampConfig.EPOCH_RESOLUTION_CONFIG, tsResolution.resolution());
         final SinkRecord originalRecord = record(null, new Struct(schema).put(FIELD, Date.from(instant)));
-        final SinkRecord transformedRecord = transformation(props).apply(originalRecord);
+        final ConnectRecord transformedRecord = transformation(props).apply(originalRecord);
         assertEquals(setNewTimestamp(originalRecord, instant.toEpochMilli()), transformedRecord);
     }
 
     @ParameterizedTest
     @EnumSource(value = ExtractTimestampConfig.TimestampResolution.class, names = {"MILLISECONDS", "SECONDS"})
     void mapWithTimestampField(final ExtractTimestampConfig.TimestampResolution tsResolution) {
-        final var datetime = ZonedDateTime.of(
+        final ZonedDateTime datetime = ZonedDateTime.of(
                 2020, 11, 15, 1, 2, 3, 4,
                 ZoneId.of("UTC")
         );
-        final var instant = datetime.toInstant();
-        final var props = new HashMap<String, String>();
+        final Instant instant = datetime.toInstant();
+        final Map props = new HashMap<String, String>();
         props.put(ExtractTimestampConfig.EPOCH_RESOLUTION_CONFIG, tsResolution.resolution());
-        final SinkRecord originalRecord = record(null, Map.of(FIELD, Date.from(instant)));
-        final SinkRecord transformedRecord = transformation(props).apply(originalRecord);
+        final SinkRecord originalRecord = record(null, ImmutableMap.of(FIELD, Date.from(instant)));
+        final ConnectRecord transformedRecord = transformation(props).apply(originalRecord);
         assertEquals(setNewTimestamp(originalRecord, instant.toEpochMilli()), transformedRecord);
     }
 
